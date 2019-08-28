@@ -1,5 +1,6 @@
 library(leaflet)
 library(ggmap)
+library(opencage)
 
 ## GET ADDRESSES
 #
@@ -11,13 +12,18 @@ library(ggmap)
 # DAN'S API KEY
 Sys.setenv(OPENCAGE_KEY="23378af2e6bc4383b03ed022788fdfb1")
 
-library(opencage)
-shelter1_location <- opencage_forward(placename = "4713 Wisconsin Ave NW, Washington, DC")
+shelters <- read.csv('data/shelters.csv', stringsAsFactors = FALSE)
 
-# shelter1_location$results['annotations.DMS.lat']
-# shelter1_location$results['annotations.DMS.lng']
-# shelter1_location$results['components._type']
+for (i in 1:nrow(shelters)) {
+   shelter_location <- opencage_forward(placename = shelters$Address[i])
 
-shelter1_tibble <- shelter1_location$results
+   # TODO: Use this value to choose the right result type, instead of just row 1
+   #            shelter1_location$results['components._type']
+   shelter_location <- shelter_location$results[1, ]  # For now, take the first result
 
-Sys.sleep(1)  # Pause for 1 second, to respect the API's rate limiting
+   # Enhance the shelters data frame   
+   shelters$Lat[i] <- shelter_location['annotations.DMS.lat']
+   shelters$Long[i] <- shelter_location['annotations.DMS.lat']
+   
+   Sys.sleep(1)  # Pause for 1 second, to respect the API's rate limiting
+}
