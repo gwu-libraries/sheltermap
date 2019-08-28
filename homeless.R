@@ -21,9 +21,17 @@ for (i in 1:nrow(shelters)) {
    #            shelter1_location$results['components._type']
    shelter_location <- shelter_location$results[1, ]  # For now, take the first result
 
-   # Enhance the shelters data frame   
-   shelters$Lat[i] <- shelter_location['annotations.DMS.lat']
-   shelters$Long[i] <- shelter_location['annotations.DMS.lat']
+   # Enhance the shelters data.frame   
+   shelters$Lat[i] <- as.numeric(shelter_location['bounds.northeast.lat'])
+   shelters$Long[i] <- as.numeric(shelter_location['bounds.northeast.lng'])
    
    Sys.sleep(1)  # Pause for 1 second, to respect the API's rate limiting
 }
+
+sheltermap <- leaflet(data=shelters) %>%
+  addTiles() %>%
+  addMarkers(lng=~Long,
+             lat=~Lat, popup=~Name)
+
+sheltermap
+  
