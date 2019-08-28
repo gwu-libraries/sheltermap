@@ -1,6 +1,12 @@
+install.packages('leaflet')
+install.packages('ggmap')
+install.packages('opencage')
+install.packages('sf')
+
 library(leaflet)
 library(ggmap)
 library(opencage)
+library(sf)
 
 ## GET ADDRESSES
 #
@@ -9,8 +15,9 @@ library(opencage)
 # Then run:
 # Sys.setenv(OPENCAGE_KEY="YOUR_API_KEY_GOES_HERE")
 
-# DAN'S API KEY
-Sys.setenv(OPENCAGE_KEY="23378af2e6bc4383b03ed022788fdfb1")
+# Put your API key in a file called apikey.txt
+apikey <- as.character(read.table('apikey.txt', stringsAsFactors = FALSE))
+Sys.setenv(OPENCAGE_KEY=apikey)
 
 shelters <- read.csv('data/shelters.csv', stringsAsFactors = FALSE)
 
@@ -34,4 +41,12 @@ sheltermap <- leaflet(data=shelters) %>%
              lat=~Lat, popup=~Name)
 
 sheltermap
+
+# Got DC census tracts shapefile from  https://opendata.dc.gov/datasets/6969dd63c5cb4d6aa32f15effb8311f3_8/data
+
+dctracts <- st_read('data/Census_Tracts_data/Census_Tracts_in_2010.shx')
+
+# Take a look at the shapefile
+ggplot() + geom_sf(data = dctracts) + coord_sf()
+
   
