@@ -7,6 +7,7 @@ library(leaflet)
 library(ggmap)
 library(opencage)
 library(sf)
+library(tidyverse)
 
 ## GET ADDRESSES
 #
@@ -44,9 +45,19 @@ sheltermap
 
 # Got DC census tracts shapefile from  https://opendata.dc.gov/datasets/6969dd63c5cb4d6aa32f15effb8311f3_8/data
 
-dctracts <- st_read('data/Census_Tracts_data/Census_Tracts_in_2010.shx')
+dctracts <- st_read('data/Census_Tracts_Data/Census_Tracts_in_2010.shx')
+
+race_by_tract <- read.csv('data/race_by_tract.csv', colClasses = c('factor', 'numeric'))
+dctracts <- merge(dctracts, race_by_tract, by='TRACT')
+
 
 # Take a look at the shapefile
-ggplot() + geom_sf(data = dctracts) + coord_sf()
+ggplot() + geom_sf(data = dctracts, aes(fill = PctAA)) + coord_sf()
 
-  
+sheltermap <- leaflet() %>%
+  addTiles() %>%
+  addMarkers(data=shelters, lng=~Long,
+             lat=~Lat, popup=~Name) 
+
+sheltermap
+
