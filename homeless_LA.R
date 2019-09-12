@@ -26,8 +26,8 @@ library(readxl)
 apikey <- as.character(read.table('apikey.txt', stringsAsFactors = FALSE))
 Sys.setenv(OPENCAGE_KEY=apikey)
 
-shelters <- read_xlsx('data/GIS_NIMBY.xlsx')
-colnames(shelters) <- c("name", "streetnumber", "street", "city", "state", "zip", "numbeds", "numhouseholds", "type", "pop", "dv", "vet", "aidshiv")
+shelters <- read_xlsx('data/shelter_addresses.xlsx', sheet = "LA")
+colnames(shelters) <- c("name", "streetnumber", "street", "city", "state", "zip", "type", "population")
 
 # make a new variable called full_address
 shelters$full_address <- paste(shelters$streetnumber, shelters$street,
@@ -35,6 +35,7 @@ shelters$full_address <- paste(shelters$streetnumber, shelters$street,
 
 # make type a factor variable
 shelters$type <- factor(shelters$type)
+shelters$population <- factor(shelter$population)
 
 # To fix row 12, change this to 12:12
 #for (i in 1:1) {
