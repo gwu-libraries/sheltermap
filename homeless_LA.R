@@ -75,8 +75,25 @@ shelters <- read.csv('data/lashelters.csv')
 
 latracts <- tracts(state = "CA", county="037")
 
+census_data_la <- read_xlsx('data/Census Tract Data.xlsx', sheet = "LA", na = c("-")) 
+
+colnames(census_data_la) <- c("geography", "pct_poverty", "error") 
+
+
+
+for (i in 1:nrow(census_data_la)) {
+   census_data_la$tract_id[i]<- substr(census_data_la$geography[i], 14, nchar(census_data_la$geography[i]))
+   census_data_la$tract_id[i]<- strsplit(census_data_la$tract_id[i], ",")[[1]][[1]]
+}
+
 # For now, randomly assign African-American % values
-latracts@data$aapct <- 100*runif(nrow(latracts))
+
+latracts@data <- merge(x=latracts@data, y=census_data_la, by.x = "NAME", by.y = "tract_id")
+
+
+
+
+######## 
 
 sheltercolor <- c("yellow", "green", "blue", "purple", "red", "orange")[shelters$type]
 icons <- awesomeIcons(
@@ -88,22 +105,25 @@ icons <- awesomeIcons(
 
 # Color palette
 pal <- colorNumeric(
-   palette = "Blues",
-   domain = latracts@data$aapct, 10)
+   palette = "Reds",
+   domain = latracts@data$pct_poverty, 10)
 
 leaflet(data = latracts) %>%
    addTiles() %>% # Add background map
-   addPolygons(popup = ~NAME, weight=2, fillColor = ~pal(aapct), fillOpacity = 0.6) %>%
+   addPolygons(popup = ~NAME, weight=1, fillColor = ~pal(pct_poverty), fillOpacity = 0.6) %>%
    addAwesomeMarkers(data=shelters, lng=~Long,
               lat=~Lat, popup=~name, icon=icons) %>%
-   addLegend("topright", pal = pal, values = ~aapct,
-             title = "Percent AA",
+   addLegend("topright", pal = pal, values = ~pct_poverty,
+             title = "Percent Poverty",
              opacity = 1) %>%
-   addLegend("bottomright", 
+   addLegend("bottomright",
              colors= levels(factor(sheltercolor)),
              labels= levels(shelters$type),
              title= "Shelter Type",
              opacity = 1)
+
+
+
 
 
 
