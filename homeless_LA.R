@@ -69,7 +69,15 @@ shelters <- read.csv('data/lashelters.csv')
 # race_by_tract <- read.csv('data/race_by_tract.csv', colClasses = c('factor', 'numeric'))
 # dctracts <- merge(dctracts, race_by_tract, by='TRACT')
 
+## combine crisis housing to one type 
 
+shelters[shelters$type=="Crisis Housing, Transition Housing", ]$type <- "Crisis Housing"
+shelters[shelters$type=="Crisis Housing, Transition Housing, Permt. Supportive Housing", ]$type <- "Crisis Housing"
+
+## get rid of extra levels that are no longer needed 
+
+shelters$type <- as.character(shelters$type)
+shelters$type <- as.factor(shelters$type)
 
 # Get census tract shape data
 
@@ -79,6 +87,8 @@ census_data_la <- read_xlsx('data/Census Tract Data.xlsx', sheet = "LA", na = c(
 
 colnames(census_data_la) <- c("geography", "pct_poverty", "error") 
 
+census_data_la$pvt_cat <- cut(census_data_la$pct_poverty, c(0,10, 20, 30, 40, 100)) 
+                        
 
 
 for (i in 1:nrow(census_data_la)) {
@@ -104,16 +114,16 @@ icons <- awesomeIcons(
 )
 
 # Color palette
-pal <- colorNumeric(
+pal_pvt <- colorFactor(
    palette = "Reds",
-   domain = latracts@data$pct_poverty, 10)
+   domain = levels(latracts@data$pvt_cat))
 
 leaflet(data=latracts) %>%
    addTiles() %>% # Add background map
-   addPolygons(popup = ~NAME, weight=1, fillColor = ~pal(pct_poverty), fillOpacity = 0.6) %>%
+   addPolygons(popup = ~NAME, weight=1, fillColor = ~pal_pvt(pvt_cat), fillOpacity = 0.6) %>%
    addAwesomeMarkers(data=shelters, lng=~Long,
               lat=~Lat, popup=~name, icon=icons) %>%
-   addLegend("topright", pal = pal, values = ~pct_poverty,
+   addLegend("topright", pal = pal_pvt, values = ~pvt_cat,
              title = "Percent Poverty",
              opacity = 1) %>%
    addLegend("bottomright",
