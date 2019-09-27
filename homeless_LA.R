@@ -105,7 +105,7 @@ latracts@data <- merge(x=latracts@data, y=census_data_la, by.x = "NAME", by.y = 
 
 ######## 
 
-sheltercolor <- c("yellow", "green", "blue", "purple", "red", "orange")[shelters$type]
+sheltercolor <- c("purple", "green", "darkblue", "orange")[shelters$type]
 icons <- awesomeIcons(
    icon = 'ios-close',
    iconColor = 'black',
