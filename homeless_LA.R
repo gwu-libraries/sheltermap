@@ -108,7 +108,7 @@ pal <- colorNumeric(
    palette = "Reds",
    domain = latracts@data$pct_poverty, 10)
 
-leaflet(data = latracts) %>%
+leaflet(data=latracts) %>%
    addTiles() %>% # Add background map
    addPolygons(popup = ~NAME, weight=1, fillColor = ~pal(pct_poverty), fillOpacity = 0.6) %>%
    addAwesomeMarkers(data=shelters, lng=~Long,
@@ -119,7 +119,7 @@ leaflet(data = latracts) %>%
    addLegend("bottomright",
              colors= levels(factor(sheltercolor)),
              labels= levels(shelters$type),
-             title= "Shelter Type",
+             title= "Shelter Type", 
              opacity = 1)
 
 
