@@ -104,7 +104,8 @@ latracts@data <- merge(x=latracts@data, y=census_data_la, by.x = "NAME", by.y = 
 
 
 ######## 
-
+# colors should match list at
+# https://www.rdocumentation.org/packages/leaflet/versions/2.0.2/topics/awesomeIcons
 sheltercolor <- c("purple", "green", "darkblue", "orange")[shelters$type]
 icons <- awesomeIcons(
    icon = 'ios-close',
