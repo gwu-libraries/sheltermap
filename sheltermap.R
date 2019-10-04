@@ -139,29 +139,58 @@ create_map <- function(shelters_csv, tracts, census_data) {
    return(sheltermap)
 }
 
+### LA
 
 lashelters <- read_xlsx('data/shelter_addresses.xlsx', sheet = "LA")
 lashelters_with_addresses <- lookup_latlong(lashelters)
 write.csv(lashelters_with_addresses, 'data/la_shelters.csv')
-###
-### NOW GO FIX THE MISSING LAT/LONG BY HAND!!!
-###
+#
+### USE GOOGLE TO FIX LAT/LONGS BEFORE RUNNING NEXT LINES
+#
 latracts <- tracts(state = "CA", county="037")
 census_data_la <- read_xlsx('data/Census Tract Data.xlsx', sheet = "LA", na = c("-")) 
 la_map <- create_map('data/la_shelters.csv', latracts, census_data_la)
 
+### DC
 
 dcshelters <- read_xlsx('data/shelter_addresses.xlsx', sheet = "DC")
 dcshelters_with_addresses <- lookup_latlong(dcshelters)
 write.csv(dcshelters_with_addresses, 'data/dc_shelters.csv')
-###
-### NOW GO FIX THE MISSING LAT/LONG BY HAND!!!
-###
+#
+### USE GOOGLE TO FIX LAT/LONGS BEFORE RUNNING NEXT LINES
+#
 dctracts <- tracts(state = "DC")
 census_data_dc <- read_xlsx('data/Census Tract Data.xlsx', sheet = "DC", na = c("-")) 
 dc_map <- create_map('data/dc_shelters.csv', dctracts, census_data_dc)
 
+### NYC
 
-# dctracts <- tracts(state = "DC")
-#sftracts
-#nytracts
+nyshelters <- read_xlsx('data/shelter_addresses.xlsx', sheet = "NYC")
+nyshelters_with_addresses <- lookup_latlong(nyshelters)
+write.csv(nyshelters_with_addresses, 'data/ny_shelters.csv')
+#
+### USE GOOGLE TO FIX LAT/LONGS BEFORE RUNNING NEXT LINES
+#
+manhattan_tracts <- tracts(state = "NY", county="061")
+staten_island_tracts <- tracts(state = "NY", county="085")
+brooklyn_tracts <- tracts(state = "NY", county="047")
+queens_tracts <- tracts(state = "NY", county="081")
+bronx_tracts <- tracts(state = "NY", county="005")
+
+nytracts <- rbind(manhattan_tracts, staten_island_tracts,
+                  brooklyn_tracts, bronx_tracts, queens_tracts)
+
+census_data_ny <- read_xlsx('data/Census Tract Data.xlsx', sheet = "NYC", na = c("-")) 
+ny_map <- create_map('data/ny_shelters.csv', nytracts, census_data_ny)
+
+### SAN FRANCISCO
+
+sfshelters <- read_xlsx('data/shelter_addresses.xlsx', sheet = "SF")
+sfshelters_with_addresses <- lookup_latlong(sfshelters)
+write.csv(sfshelters_with_addresses, 'data/sf_shelters.csv')
+#
+### USE GOOGLE TO FIX LAT/LONGS BEFORE RUNNING NEXT LINES
+#
+sftracts <- tracts(state = "CA", county="075")
+census_data_sf <- read_xlsx('data/Census Tract Data.xlsx', sheet = "SF", na = c("-")) 
+sf_map <- create_map('data/sf_shelters.csv', sftracts, census_data_sf)
