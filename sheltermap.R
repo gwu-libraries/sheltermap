@@ -20,7 +20,7 @@ lookup_latlong <- function(shelters) {
   apikey <- as.character(read.table('apikey.txt', stringsAsFactors = FALSE))
   Sys.setenv(OPENCAGE_KEY=apikey)
   
-  colnames(shelters) <- c("name", "streetnumber", "street", "city", "state", "zip", "type", "population")
+  colnames(shelters) <- c("name", "streetnumber", "street", "city", "state", "zip", "raw_type", "type", "population")
   
   # make a new variable called full_address
   shelters$full_address <- paste(shelters$streetnumber, shelters$street,
@@ -76,8 +76,8 @@ create_map <- function(shelters_csv, tracts, census_data) {
   
   ## combine crisis housing to one type 
   
-  shelters[shelters$type=="Crisis Housing, Transition Housing", ]$type <- "Crisis Housing"
-  shelters[shelters$type=="Crisis Housing, Transition Housing, Permt. Supportive Housing", ]$type <- "Crisis Housing"
+  #shelters[shelters$type=="Crisis Housing, Transition Housing", ]$type <- "Crisis Housing"
+  #shelters[shelters$type=="Crisis Housing, Transition Housing, Permt. Supportive Housing", ]$type <- "Crisis Housing"
   
   ## get rid of extra levels that are no longer needed 
   
@@ -151,15 +151,15 @@ census_data_la <- read_xlsx('data/Census Tract Data.xlsx', sheet = "LA", na = c(
 la_map <- create_map('data/la_shelters.csv', latracts, census_data_la)
 
 
-lashelters <- read_xlsx('data/shelter_addresses.xlsx', sheet = "LA")
-lashelters_with_addresses <- lookup_latlong(lashelters)
-write.csv(lashelters_with_addresses, 'data/la_shelters.csv')
+dcshelters <- read_xlsx('data/shelter_addresses.xlsx', sheet = "DC")
+dcshelters_with_addresses <- lookup_latlong(dcshelters)
+write.csv(dcshelters_with_addresses, 'data/dc_shelters.csv')
 ###
 ### NOW GO FIX THE MISSING LAT/LONG BY HAND!!!
 ###
-latracts <- tracts(state = "CA", county="037")
-census_data_la <- read_xlsx('data/Census Tract Data.xlsx', sheet = "LA", na = c("-")) 
-la_map <- create_map('data/la_shelters.csv', latracts, census_data_la)
+dctracts <- tracts(state = "DC")
+census_data_dc <- read_xlsx('data/Census Tract Data.xlsx', sheet = "DC", na = c("-")) 
+dc_map <- create_map('data/dc_shelters.csv', dctracts, census_data_dc)
 
 
 # dctracts <- tracts(state = "DC")
