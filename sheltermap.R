@@ -5,6 +5,7 @@ library(opencage)
 library(sf)
 library(tidyverse)
 library(readxl)
+library(sp)
 
 lookup_latlong <- function(shelters) {
 
@@ -42,9 +43,22 @@ lookup_latlong <- function(shelters) {
     #            shelter1_location$results['components._type']
     shelter_location <- shelter_location$results[1, ]  # For now, take the first result
     
-    # Enhance the shelters data.frame   
-    shelters$Lat[i] <- as.numeric(shelter_location['bounds.northeast.lat'])
-    shelters$Long[i] <- as.numeric(shelter_location['bounds.northeast.lng'])
+    # Enhance the shelters data.frame 
+    
+    # get the string lat/long
+    lat_dms_char <- shelter_location['annotations.DMS.lat']
+    long_dms_char <- shelter_location['annotations.DMS.lng']
+    
+    # convert to "DMS" objects
+    lat_dms <- char2dms(from=lat_dms_char, chd='°', chm="'", chs="''")
+    long_dms <- char2dms(from=long_dms_char, chd='°', chm="'", chs="''")
+    
+    # convert to numbers
+    lat_dms_num <- as.numeric(lat_dms)
+    long_dms_num <- as.numeric(long_dms)
+    
+    shelters$Lat[i] <- lat_dms_num
+    shelters$Long[i] <- long_dms_num
     
     Sys.sleep(1)  # Pause for 1 second, to respect the API's rate limiting
   }
@@ -124,6 +138,17 @@ create_map <- function(shelters_csv, tracts, census_data) {
    
    return(sheltermap)
 }
+
+
+lashelters <- read_xlsx('data/shelter_addresses.xlsx', sheet = "LA")
+lashelters_with_addresses <- lookup_latlong(lashelters)
+write.csv(lashelters_with_addresses, 'data/la_shelters.csv')
+###
+### NOW GO FIX THE MISSING LAT/LONG BY HAND!!!
+###
+latracts <- tracts(state = "CA", county="037")
+census_data_la <- read_xlsx('data/Census Tract Data.xlsx', sheet = "LA", na = c("-")) 
+la_map <- create_map('data/la_shelters.csv', latracts, census_data_la)
 
 
 lashelters <- read_xlsx('data/shelter_addresses.xlsx', sheet = "LA")
